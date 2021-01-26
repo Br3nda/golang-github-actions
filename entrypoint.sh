@@ -29,9 +29,8 @@ send_comment() {
 # mod_download is getting go modules using go.mod.
 mod_download() {
 	if [ ! -e go.mod ]; then go mod init; fi
-	git config --global url."https://${{GITHUB_TOKEN}}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 	go mod download
-	if [ $? -ne 0 ]; then exit 1; fi
+# 	if [ $? -ne 0 ]; then exit 1; fi
 }
 
 # check_errcheck is excute "errcheck" and generate ${COMMENT} and ${SUCCESS}
