@@ -6,7 +6,7 @@ set -e
 # ------------------------
 RUN=$1
 WORKING_DIR=$2
-SEND_COMMNET=$3
+SEND_COMMENT=$3
 GITHUB_TOKEN=$4
 FLAGS=$5
 IGNORE_DEFER_ERR=$6
@@ -14,6 +14,7 @@ IGNORE_DEFER_ERR=$6
 COMMENT=""
 SUCCESS=0
 
+export GOPRIVATE=github.com/AnimationMentor/*
 
 # ------------------------
 #  Functions
@@ -30,7 +31,7 @@ send_comment() {
 mod_download() {
 	if [ ! -e go.mod ]; then go mod init; fi
 	go mod download
-# 	if [ $? -ne 0 ]; then exit 1; fi
+	if [ $? -ne 0 ]; then exit 1; fi
 }
 
 # check_errcheck is excute "errcheck" and generate ${COMMENT} and ${SUCCESS}
@@ -49,7 +50,7 @@ check_errcheck() {
 		return
 	fi
 
-	if [ "${SEND_COMMNET}" = "true" ]; then
+	if [ "${SEND_COMMENT}" = "true" ]; then
 		COMMENT="## ⚠ errcheck Failed
 \`\`\`
 ${OUTPUT}
@@ -70,7 +71,7 @@ check_fmt() {
 		return
 	fi
 
-	if [ "${SEND_COMMNET}" = "true" ]; then
+	if [ "${SEND_COMMENT}" = "true" ]; then
 		FMT_OUTPUT=""
 		for file in ${UNFMT_FILES}; do
 			FILE_DIFF=$(gofmt -d -e "${file}" | sed -n '/@@.*/,//{/@@.*/d;p}')
@@ -102,7 +103,7 @@ check_imports() {
 		return
 	fi
 
-	if [ "${SEND_COMMNET}" = "true" ]; then
+	if [ "${SEND_COMMENT}" = "true" ]; then
 		FMT_OUTPUT=""
 		for file in ${UNFMT_FILES}; do
 			FILE_DIFF=$(goimports -d -e "${file}" | sed -n '/@@.*/,//{/@@.*/d;p}')
@@ -134,7 +135,7 @@ check_lint() {
 		return
 	fi
 
-	if [ "${SEND_COMMNET}" = "true" ]; then
+	if [ "${SEND_COMMENT}" = "true" ]; then
 		COMMENT="## ⚠ golint Failed
 $(echo "${OUTPUT}" | awk 'END{print}')
 <details><summary>Show Detail</summary>
@@ -158,7 +159,7 @@ check_sec() {
 		return
 	fi
 
-	if [ "${SEND_COMMNET}" = "true" ]; then
+	if [ "${SEND_COMMENT}" = "true" ]; then
 		COMMENT="## ⚠ gosec Failed
 \`\`\`
 $(tail -n 6 result.txt)
@@ -186,7 +187,7 @@ check_shadow() {
 		return
 	fi
 
-	if [ "${SEND_COMMNET}" = "true" ]; then
+	if [ "${SEND_COMMENT}" = "true" ]; then
 		COMMENT="## ⚠ shadow Failed
 \`\`\`
 ${OUTPUT}
@@ -206,7 +207,7 @@ check_staticcheck() {
 		return
 	fi
 
-	if [ "${SEND_COMMNET}" = "true" ]; then
+	if [ "${SEND_COMMENT}" = "true" ]; then
 		COMMENT="## ⚠ staticcheck Failed
 \`\`\`
 ${OUTPUT}
@@ -228,7 +229,7 @@ check_vet() {
 		return
 	fi
 
-	if [ "${SEND_COMMNET}" = "true" ]; then
+	if [ "${SEND_COMMENT}" = "true" ]; then
 		COMMENT="## ⚠ vet Failed
 \`\`\`
 ${OUTPUT}
@@ -282,7 +283,7 @@ esac
 if [ ${SUCCESS} -ne 0 ]; then
 	echo "Check Failed!!"
 	echo ${COMMENT}
-	if [ "${SEND_COMMNET}" = "true" ]; then
+	if [ "${SEND_COMMENT}" = "true" ]; then
 		send_comment
 	fi
 fi
